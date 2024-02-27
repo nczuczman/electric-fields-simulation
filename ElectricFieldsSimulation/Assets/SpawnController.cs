@@ -7,26 +7,26 @@ public class SpawnController : MonoBehaviour
 
     [SerializeField] public GameObject particle;
     // Start is called before the first frame update
-    System.Random random = new System.Random();
+    public Vector3 screenPosition;
+    public Vector3 worldPosition;
 
     void Start()
     {
-        
+        screenPosition = Input.mousePosition;
+
+        worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(1))
         {
-            Instantiate(particle, transform.position, Quaternion.identity);
+            screenPosition = Input.mousePosition;
 
-            int x = random.Next(-100, 100);
-            int y = random.Next(-50, 50);
+            worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
 
-            Vector3 newPos = new Vector3(x, y, 0);
-            transform.position = newPos;
-
+            Instantiate(particle, worldPosition, Quaternion.identity);
         }
     }
 }
