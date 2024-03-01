@@ -5,30 +5,50 @@ using UnityEngine;
 public class ParticleController : MonoBehaviour
 {
     [SerializeField] private GameObject SourceCharge;
+    [SerializeField] private GameObject particle;
     [SerializeField] private float charge;
     private float CouloumbsConstant = 8990000000.0f;
+    List<GameObject> particles = new List<GameObject>();
 
-    Rigidbody rig;
-    float strengthField1;
-    float distance1;
-    float force1;
+    public Vector3 screenPosition;
+    public Vector3 worldPosition;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        rig = GetComponent<Rigidbody>();
-        
+
+        screenPosition = Input.mousePosition;
+
+        worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+
+        particles.Add(particle);
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
-        force1 = strengthField1 * charge;
-        distance1 = Vector2.Distance(rig.transform.position, SourceCharge.transform.position);
-        if (distance1 > 0.1f)
+        foreach (GameObject particle in particles)
         {
-            strengthField1 = (charge * CouloumbsConstant) / Mathf.Pow(distance1, 2f);
-            rig.AddForce((SourceCharge.transform.position - rig.transform.position) * force1);
+            float distance = Vector3.Distance(particle.transform.position, SourceCharge.transform.position);
+            if (distance > 0.2f)
+            {
+                float fieldStrength = (CouloumbsConstant * charge) / Mathf.Pow(distance, 2f);
+                Vector3 force = (SourceCharge.transform.position - particle.transform.position) * fieldStrength * charge * Time.deltaTime;
+                particle.GetComponent<Rigidbody>().AddForce(force);
+            }
+
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            screenPosition = Input.mousePosition;
+
+            worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+
+            GameObject newParticle = Instantiate(particle, worldPosition, Quaternion.identity);
+            particles.Add(newParticle);
+
         }
 
     }
